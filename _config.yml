@@ -33,7 +33,8 @@ highlightjs_theme: "atom-one-light"
 pagination:
   enabled: true
   per_page: 5
-  permalink: "/page/:num/"
+  #permalink: "/page/:num/"
+  permalink: "/page:num"
   sort_reverse: true
 
 # Archive settings (see https://github.com/jekyll/jekyll-archives/)
