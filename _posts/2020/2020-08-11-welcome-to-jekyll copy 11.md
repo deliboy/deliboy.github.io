@@ -4,6 +4,8 @@ title:  "Welcome to 한글은 뭐지 Jekyll!"
 date:   2020-08-25 14:00:40 +0900
 category: 한글 테스트
 tags: [aaaa,bbbb]
+background: '/img/bg/01.jpg'
+
 ---
 
 안녕하세요 한글 폰트 테스트 용입니다.
