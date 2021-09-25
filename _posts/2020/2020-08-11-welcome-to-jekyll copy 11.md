@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Welcome to 한글은 뭐지 Jekyll!"
-date:   2020-08-25 14:00:40 +0900
+date:   2020-08-01 14:00:40 +0900
 category: 한글 테스트
 tags: [aaaa,bbbb]
 background: '/img/bg/01.jpg'

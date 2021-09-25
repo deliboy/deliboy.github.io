@@ -1,9 +1,9 @@
-title:              Clean Blog
-email:              your-email@example.com
-description:        A Blog Theme by Start Bootstrap
-author:             Start Bootstrap
+title:              Deliboy Blog
+email:              jindalre@gmail.com
+description:        uncle developer
+author:             deliboy
 baseurl:            ""
-url:                "https://startbootstrap.github.io"
+url:                "https://deliboy.github.io"
 
 # Social Profiles
 twitter_username:   SBootstrap
