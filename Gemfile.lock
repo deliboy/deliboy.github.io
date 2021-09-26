@@ -77,6 +77,7 @@ DEPENDENCIES
   jekyll-feed (~> 0.6)
   jekyll-paginate (~> 1.1.0)
   jekyll-sitemap
+  rouge (~> 3.26)
   tzinfo-data
   wdm (~> 0.1.0)
   webrick (~> 1.7)

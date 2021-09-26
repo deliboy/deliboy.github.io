@@ -6,10 +6,15 @@ background: '/img/bg/category.jpg'
 ---
 
 {% for category in site.categories %}
-  <h3>{{ category[0] }}</h3>
-  <ul>
-    {% for post in category[1] %}
-      <div><a href="{{ post.url }}">{{ post.title }}</a> <small>{{ post.date | date: '%B %d, %Y' }}</small></div>
-    {% endfor %}
-  </ul>
+<h3>{{ category[0] }}</h3>
+<ul>
+  {% for post in category[1] %}
+  <div>
+    <small style="color:deeppink;">{{ post.date | date: '%Y.%m.%d, %a' }}</small>
+
+    &puncsp;
+    <a href="{{ post.url }}">{{ post.title }}</a>
+  </div>
+  {% endfor %}
+</ul>
 {% endfor %}

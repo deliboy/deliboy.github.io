@@ -1,0 +1,203 @@
+I"�<h2 id="시작">시작</h2>
+<blockquote>
+  <p><strong>목적: markdown 파서마다 조금씩 지원하는 옵션이 달라서 확인 차원에서 작성</strong></p>
+</blockquote>
+
+<h3 id="주요-확인-내용">주요 확인 내용</h3>
+<ol>
+  <li>테이블 정렬</li>
+  <li>이미지 사이즈 조절</li>
+  <li>ol형 리스트 “1”로만으로도 인덱스 자동 증가 되는가</li>
+</ol>
+
+<hr />
+
+<h2 id="본문">본문</h2>
+<h3 id="코드-블럭">코드 블럭</h3>
+
+<div class="language-cs highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">Worker</span><span class="p">:</span><span class="n">Person</span><span class="p">{</span>
+    <span class="k">private</span> <span class="kt">string</span> <span class="n">_name</span><span class="p">;</span>
+    <span class="k">public</span> <span class="n">String</span> <span class="n">Alias</span><span class="p">{</span><span class="k">get</span><span class="p">;</span><span class="k">set</span><span class="p">;}</span>
+    <span class="k">public</span> <span class="kt">int</span> <span class="n">Age</span> <span class="p">=&gt;</span> <span class="k">get</span><span class="p">;</span><span class="k">set</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="표">표</h3>
+<blockquote>
+  <p>정렬이 잘 되는지 확인</p>
+</blockquote>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>|왼왼왼왼왼|가가가가가|오오오오오|
+|--|:--:|--:|
+|left|가운데|오른쪽|
+|left|가운데|오른쪽|
+|left|가운데|오른쪽|
+|left|가운데|오른쪽|
+</code></pre></div></div>
+
+<table>
+  <thead>
+    <tr>
+      <th>왼왼왼왼왼</th>
+      <th style="text-align: center">가가가가가</th>
+      <th style="text-align: right">오오오오오</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>left</td>
+      <td style="text-align: center">가운데</td>
+      <td style="text-align: right">오른쪽</td>
+    </tr>
+    <tr>
+      <td>left</td>
+      <td style="text-align: center">가운데</td>
+      <td style="text-align: right">오른쪽</td>
+    </tr>
+    <tr>
+      <td>left</td>
+      <td style="text-align: center">가운데</td>
+      <td style="text-align: right">오른쪽</td>
+    </tr>
+    <tr>
+      <td>left</td>
+      <td style="text-align: center">가운데</td>
+      <td style="text-align: right">오른쪽</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="블럭-인용">블럭 인용</h3>
+
+<div class="language-markdown highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gt">&gt;인용1</span>
+<span class="gt">&gt;&gt;인용2</span>
+<span class="gt">&gt;&gt;&gt;인용3</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>인용1</p>
+  <blockquote>
+    <p>인용2</p>
+    <blockquote>
+      <p>인용3</p>
+    </blockquote>
+  </blockquote>
+</blockquote>
+
+<h3 id="강조">강조</h3>
+
+<div class="language-markdown highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gs">__강__</span> 약 <span class="gs">**강**</span> 약
+</code></pre></div></div>
+
+<p><strong>강</strong> 약 <strong>강</strong> 약</p>
+
+<h3 id="기울임꼴">기울임꼴</h3>
+
+<div class="language-markdown highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="ge">_기울어져라_</span> 펴저라 <span class="gs">**_두껍게 기울어져라_**</span>
+</code></pre></div></div>
+
+<p><em>기울어져라</em> 펴저라 <strong><em>두껍게 기울어져라</em></strong></p>
+
+<h3 id="목록">목록</h3>
+<blockquote>
+  <p>숫자형 리스트 1로만 써도 알아서 순서가 지정되는 지 확인
+이거 안되면 문서 수정할때 엄청 불편함</p>
+</blockquote>
+
+<div class="language-markdown highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">1.</span> 첫번째
+<span class="p">    1.</span> 일의일
+<span class="p">    1.</span> 일의이
+<span class="p">1.</span> 두번째
+<span class="p">    1.</span> 두번째의 첫번째
+<span class="p">        1.</span> 두번째의 첫번째의 첫번째
+<span class="p">            1.</span> 2-1-1-1
+<span class="p">            1.</span> 2-1-1-2
+<span class="p">    1.</span> 두번째의 두번째
+<span class="p">1.</span> 세번째
+<span class="p">
+-</span> 첫번째
+<span class="p">    -</span> 들어가
+<span class="p">        -</span> 또 들어가
+<span class="p">            -</span> 또또는 마크가 같아요
+<span class="p">-</span> 두번째
+<span class="p">-</span> 세번째
+</code></pre></div></div>
+
+<ol>
+  <li>첫번째
+    <ol>
+      <li>일의일</li>
+      <li>일의이</li>
+    </ol>
+  </li>
+  <li>두번째
+    <ol>
+      <li>두번째의 첫번째
+        <ol>
+          <li>두번째의 첫번째의 첫번째
+            <ol>
+              <li>2-1-1-1</li>
+              <li>2-1-1-2</li>
+            </ol>
+          </li>
+        </ol>
+      </li>
+      <li>두번째의 두번째</li>
+    </ol>
+  </li>
+  <li>세번째</li>
+</ol>
+
+<ul>
+  <li>첫번째
+    <ul>
+      <li>들어가
+        <ul>
+          <li>또 들어가
+            <ul>
+              <li>또또는 마크가 같아요</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>두번째</li>
+  <li>세번째</li>
+</ul>
+
+<h3 id="링크">링크</h3>
+
+<div class="language-markdown highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="nv">네이버</span><span class="p">](</span><span class="sx">https://naver.com</span><span class="p">)</span>
+<span class="gs">**[구글](https://naver.com)**</span>
+<span class="ge">_**[구글](https://naver.com)**_</span>
+<span class="p">
+1.</span> <span class="p">[</span><span class="nv">네이버</span><span class="p">](</span><span class="sx">https://naver.com</span><span class="p">)</span>
+<span class="p">1.</span> <span class="gs">**[구글](https://naver.com)**</span>
+<span class="p">1.</span> _<span class="gs">**[구글](https://naver.com)**</span>_
+</code></pre></div></div>
+<p><a href="https://naver.com">네이버</a>
+<strong><a href="https://naver.com">구글</a></strong>
+<em><strong><a href="https://naver.com">구글</a></strong></em></p>
+
+<ol>
+  <li><a href="https://naver.com">네이버</a></li>
+  <li><strong><a href="https://naver.com">구글</a></strong></li>
+  <li><em><strong><a href="https://naver.com">구글</a></strong></em></li>
+</ol>
+
+<h3 id="이미지">이미지</h3>
+
+<p><img src="/assets/logo.png" alt="대체문자" />
+<img src="/assets/logo1.png" alt="대체문자" />
+<a href="https://naver.com"><img src="/assets/logo.png" alt="대체문자" /></a>
+<img src="/assets/logo.png" alt="대체문자" />{width=80px}</p>
+
+<hr />
+<h2 id="결론">결론</h2>
+<ul>
+  <li>ul형 리스트 블릿 모양은 한가지 종류임</li>
+  <li>코드 블럭은 항상 첫줄과 마지막 줄이 newline이어야 함</li>
+  <li>이미지 사이즈는 조절되지 않음(원래 표준이 아님)</li>
+</ul>
+:ET

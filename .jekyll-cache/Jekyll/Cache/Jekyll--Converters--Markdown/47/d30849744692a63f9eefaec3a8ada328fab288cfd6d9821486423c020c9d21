@@ -1,0 +1,219 @@
+I"<h2 id="ruby-jekyll을-이용해서-githubio에-블로그-생성">ruby Jekyll을 이용해서 github.io에 블로그 생성</h2>
+
+<blockquote>
+  <p>velog에서 mermaid 또는 plantuml 사용 할 수 없어서 github에 만듦</p>
+</blockquote>
+
+<h3 id="도움받은-사이트">도움받은 사이트</h3>
+<ol>
+  <li><a href="https://zeddios.tistory.com/1222">왕초보를 위한 Github 블로그 만들기</a></li>
+  <li><a href="http://jekyllthemes.org/themes/centrarium/">theme centrairum</a></li>
+  <li><a href="https://frhyme.github.io/mermaid/Embedding_mermaid_in_github_page/">github page에서 Mermaid …</a></li>
+</ol>
+
+<h3 id="설치-과정-정리">설치 과정 정리</h3>
+<ul>
+  <li>ruby 설치</li>
+  <li>gem 설치</li>
+  <li><a href="https://zeddios.tistory.com/1222">왕초보를 위한 Github 블로그 만들기</a> 따라하기</li>
+  <li>중간에 webrick 없다고 에러 발생해서  bundle add webrick 추가</li>
+  <li>중간중간 bundle install, bundle update 명령어 날려서 오류 해결</li>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>bundle install</td>
+          <td>bundle exec jekyll serve 명령어로 로컬 서버 실행 확인</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li>테마 색은 blue에서 orange 로 변경  _sass\base_variables.scss 파일</li>
+  <li>typography.md 파일 제거</li>
+</ul>
+
+<h3 id="mermaid-사용법-확인">mermaid 사용법 확인</h3>
+<p><em>mermaid는 plantuml보다 기능이 훨씬 떨어지지만 plantuml은 코드로 넣치 못하고 이미지를 삽입해야해서 수정 사항이 발생하면 귀찮음</em></p>
+
+<h4 id="모든-mermaid-diagram이-지원하는지-확인">모든 mermaid diagram이 지원하는지 확인</h4>
+<p><strong>1. Flowchart</strong></p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"mermaid"</span><span class="nt">&gt;</span>
+graph LR;
+    A--&gt;B;
+    B--&gt;C;
+<span class="nt">&lt;/div&gt;</span>
+
+</code></pre></div></div>
+
+<div class="mermaid">
+graph LR;
+    A--&gt;B;
+    B--&gt;C;
+</div>
+
+<p><strong>2. Sequence Diagram</strong></p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"mermaid"</span><span class="nt">&gt;</span>
+sequenceDiagram
+    autonumber
+    Alice-&gt;&gt;John: Hello John, how are you?
+    loop Healthcheck
+        John-&gt;&gt;John: Fight against hypochondria
+    end
+    Note right of John: Rational thoughts!
+    John--&gt;&gt;Alice: Great!
+    John-&gt;&gt;Bob: How about you?
+    Bob--&gt;&gt;John: Jolly good!
+</code></pre></div></div>
+<div class="mermaid">
+sequenceDiagram
+    autonumber
+    Alice-&gt;&gt;John: Hello John, how are you?
+    loop Healthcheck
+        John-&gt;&gt;John: Fight against hypochondria
+    end
+    Note right of John: Rational thoughts!
+    John--&gt;&gt;Alice: Great!
+    John-&gt;&gt;Bob: How about you?
+    Bob--&gt;&gt;John: Jolly good!
+</div>
+
+<p><strong>3. Class Diagram</strong></p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"mermaid"</span><span class="nt">&gt;</span>
+classDiagram
+  direction RL
+  class Student {
+    -idCard : IdCard
+  }
+  class IdCard{
+    -id : int
+    -name : string
+  }
+  class Bike{
+    -id : int
+    -name : string
+  }
+  Student "1" --o "1" IdCard : carries
+  Student "1" --o "1" Bike : rides
+</code></pre></div></div>
+
+<div class="mermaid">
+classDiagram
+  direction RL
+  class Student {
+    -idCard : IdCard
+  }
+  class IdCard{
+    -id : int
+    -name : string
+  }
+  class Bike{
+    -id : int
+    -name : string
+  }
+  Student "1" --o "1" IdCard : carries
+  Student "1" --o "1" Bike : rides
+</div>
+
+<p><strong>4. State Diagram</strong></p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"mermaid"</span><span class="nt">&gt;</span>
+stateDiagram
+    direction LR
+    [*] --&gt; A
+    A --&gt; B
+    B --&gt; C
+    state B {
+      direction LR
+      a --&gt; b
+    }
+    B --&gt; D
+</code></pre></div></div>
+<div class="mermaid">
+stateDiagram
+    direction LR
+    [*] --&gt; A
+    A --&gt; B
+    B --&gt; C
+    state B {
+      direction LR
+      a --&gt; b
+    }
+    B --&gt; D
+</div>
+
+<p><strong>5. ERD Diagram</strong></p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"mermaid"</span><span class="nt">&gt;</span>
+erDiagram
+    CAR ||--o{ NAMED-DRIVER : allows
+    CAR {
+        string registrationNumber
+        string make
+        string model
+    }
+    PERSON ||--o{ NAMED-DRIVER : is
+    PERSON {
+        string firstName
+        string lastName
+        int age
+    }
+</code></pre></div></div>
+<div class="mermaid">
+erDiagram
+    CAR ||--o{ NAMED-DRIVER : allows
+    CAR {
+        string registrationNumber
+        string make
+        string model
+    }
+    PERSON ||--o{ NAMED-DRIVER : is
+    PERSON {
+        string firstName
+        string lastName
+        int age
+    }
+</div>
+
+<p><strong>6. Gantt Diagram</strong></p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"mermaid"</span><span class="nt">&gt;</span>
+gantt
+    title A Gantt Diagram
+    dateFormat  YYYY-MM-DD
+    section Section
+    A task           :a1, 2014-01-01, 30d
+    Another task     :after a1  , 20d
+    section Another
+    Task in sec      :2014-01-12  , 12d
+    another task      : 24d
+</code></pre></div></div>
+<div class="mermaid">
+gantt
+    title A Gantt Diagram
+    dateFormat  YYYY-MM-DD
+    section Section
+    A task           :a1, 2014-01-01, 30d
+    Another task     :after a1  , 20d
+    section Another
+    Task in sec      :2014-01-12  , 12d
+    another task      : 24d
+</div>
+
+<p><strong>7. PIE Diagram</strong></p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"mermaid"</span><span class="nt">&gt;</span>
+pie title Pets adopted by volunteers
+    "Dogs" : 386
+    "Cats" : 85
+    "Rats" : 15
+</code></pre></div></div>
+<div class="mermaid">
+pie title Pets adopted by volunteers
+    "Dogs" : 386
+    "Cats" : 85
+    "Rats" : 15
+</div>
+:ET
