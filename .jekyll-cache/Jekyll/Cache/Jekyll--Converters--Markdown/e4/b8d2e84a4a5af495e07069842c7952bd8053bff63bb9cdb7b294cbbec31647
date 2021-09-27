@@ -1,0 +1,384 @@
+I""�<p>이번 포스트에서는 asp.net core에서 graphql query에 대한 가장 기초적인 부분에 대해 알아본다.</p>
+
+<h2 id="목차">목차</h2>
+
+<h4 id="graphql이란-무엇인가">graphql이란 무엇인가?</h4>
+<p><a href="https://www.yalco.kr/24_graphql/">얄코</a>
+<a href="https://tech.kakao.com/2019/08/01/graphql-basic/">GraphQL 개념잡기</a>
+<a href="https://graphql.org/">공식사이트</a>
+<a href="https://chillicream.com/docs/hotchocolate">핫초콜릿</a></p>
+
+<p>결국 graphql은 웹 환경에서 서버와 클라이언트간의 데이터 통신 스키마를 잘(?) 잘 정해 놓고 사용하자는 것.</p>
+
+<p>graphql을 처음 봤을때 이건 또 뭐야 알아야 할께 또 생겼네 싶었다. 그러다 곰곰이 생각해보니 이걸 적용하면 개발자간의 다툼이 
+줄겠구나 하는 생각이 들었다.</p>
+
+<p>예전에는 어떻게 데이터 스키마를 정했는지 내가 했던 경험을 얘기보겠다.</p>
+
+<ol>
+  <li>client가 db에 바로 쿼리를 날리던 시절에는 포맷에 대한 이슈 없음</li>
+  <li>TCP-IP 통신 작성할 때 패킷 사이즈는 어떻게 할것 인가 빅엔디언, 리틀엔디언 뭘로 할건가에 대한 이슈</li>
+  <li>java corba 등장 이게 다 앂어 먹을것 같았는데 별거 없이 끝남.</li>
+  <li>java rmi</li>
+  <li>.net remoting service 꽤 잘 사용했지만 xml로 직렬화 할지 binary로 직렬화 할지에 대한 작은 이슈</li>
+  <li>wcf 등장 이걸로 프로젝트 한 경험 없음 이때 이미 json으로 대동 단결되었던것 같음</li>
+  <li>데이터 포맷은 json 대동단결 back-end, front-end 구분이 모호하던 시절 개발자 마음대로 포맷 정함</li>
+  <li>rest등장 내가 생각하는 가장 쓰레기 같은 방식, 외부 연동 api를 해봐도 정말 규칙되로 된곳은 없음
+나도 이규칙대로는 도저히 못하겠음. criteria가 복잡한 경우 미쳐버림. 결국 post로 다 요청함</li>
+  <li>프로젝트마다 나름대로 포맷 규칙 정해서 사용
+    <h5 id="예-요청">예) 요청</h5>
+    <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span>
+ <span class="dl">"</span><span class="s2">lastName</span><span class="dl">"</span><span class="p">:</span><span class="dl">"</span><span class="s2">kim</span><span class="dl">"</span><span class="p">,</span>
+ <span class="dl">"</span><span class="s2">checkinDate</span><span class="dl">"</span><span class="p">:</span><span class="dl">"</span><span class="s2">2020-01-08</span><span class="dl">"</span><span class="p">,</span>
+ <span class="dl">"</span><span class="s2">checkoutDate</span><span class="dl">"</span><span class="p">:</span><span class="dl">"</span><span class="s2">2020-01-09</span><span class="dl">"</span><span class="p">,</span>
+ <span class="dl">"</span><span class="s2">status</span><span class="dl">"</span><span class="p">:</span><span class="mi">18</span><span class="p">,</span>
+ <span class="dl">"</span><span class="s2">nation</span><span class="dl">"</span><span class="p">:</span><span class="dl">"</span><span class="s2">KR</span><span class="dl">"</span>
+<span class="p">}</span>
+</code></pre></div>    </div>
+    <h5 id="응답">응답</h5>
+    <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span>
+ <span class="dl">"</span><span class="s2">results</span><span class="dl">"</span><span class="p">:[{....},{....},{....}]</span>
+ <span class="dl">"</span><span class="s2">isError</span><span class="dl">"</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span>
+ <span class="dl">"</span><span class="s2">exception</span><span class="dl">"</span><span class="p">:{</span>
+ 	<span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span>
+     <span class="dl">"</span><span class="s2">message</span><span class="dl">"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span>
+ <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>graphql등장 9에 했던 스키마를 프로젝트마다가 아니라 graphql의 도움을 받아서 일원화 할 수 있음.
+graphql도 만능은 아님, 특정언어에 국한된게 아니기 때문에 제약 사항이 꽤 있고, 간단히 처리 할 수 있는 부분을 
+복잡해질 수도 있지만, 서버와 클라이언트는 이미 스키마가 정해졌기 때문에 규칙대로만 개발하면됨. 
+그리고 ORM을 사용시 entity 객체를 client까지 사용할지 항상 고민되는데 고민없이 무조건 VO, DTO를 찍으면됨</li>
+</ol>
+
+<h3 id="1-nuget-downlaod">1. nuget downlaod</h3>
+
+<h3 id="2-기본적인-코드-작성">2. 기본적인 코드 작성</h3>
+<ul>
+  <li>entity 작성
+    <ul>
+      <li>Member.cs</li>
+    </ul>
+  </li>
+  <li>dto 작성
+    <ul>
+      <li>MemberSearchRequest.cs</li>
+      <li>MemberVO.cs</li>
+    </ul>
+  </li>
+  <li>서비스 및 리파지토리 클래스 작성
+    <ul>
+      <li>PensionService.cs</li>
+      <li>MemberRepository.cs</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="3-startupcs-수정">3 Startup.cs 수정</h3>
+
+<h3 id="4-graphql-test">4 graphql test</h3>
+
+<h3 id="5-문제점">5 문제점</h3>
+
+<h3 id="6-해결방법">6 해결방법</h3>
+<hr />
+<h2 id="본문">본문</h2>
+
+<h3 id="1-nuget-downlaod-1">1. nuget downlaod</h3>
+<blockquote>
+  <p>“HotChocolate.AspNetCore” Version=”11.3.7”</p>
+</blockquote>
+
+<h3 id="2-기본적인-코드-작성-1">2. 기본적인 코드 작성</h3>
+<p>** - entity 작성**
+<em>Member.cs</em></p>
+
+<div class="language-cs highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">MyPension.Entities</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">class</span> <span class="nc">Member</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">Name</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">public</span> <span class="kt">long</span> <span class="n">Id</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">public</span> <span class="n">DateTime</span> <span class="n">BirthDay</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">Email</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>** - vo  (<em>MemberVO.cs</em>)**</p>
+<div class="language-cs highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">MyPension.Entities</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">MyPension.Dtos.VO</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">class</span> <span class="nc">MemberVO</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="nf">MemberVO</span><span class="p">(</span><span class="n">Member</span> <span class="n">entity</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">Name</span> <span class="p">=</span> <span class="n">entity</span><span class="p">.</span><span class="n">Name</span><span class="p">;</span>
+            <span class="n">Id</span> <span class="p">=</span> <span class="n">entity</span><span class="p">.</span><span class="n">Id</span><span class="p">;</span>
+            <span class="n">BirthDay</span> <span class="p">=</span> <span class="n">entity</span><span class="p">.</span><span class="n">BirthDay</span><span class="p">.</span><span class="n">Date</span><span class="p">;</span>
+            <span class="n">Email</span> <span class="p">=</span> <span class="n">entity</span><span class="p">.</span><span class="n">Email</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">Name</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">public</span> <span class="kt">long</span> <span class="n">Id</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">public</span> <span class="n">DateTime</span> <span class="n">BirthDay</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">Email</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>** - 검색 criteria request  (<em>MemberSearchRequest.cs</em>)**</p>
+
+<div class="language-cs highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">namespace</span> <span class="nn">MyPension.Dtos.Requests</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">class</span> <span class="nc">MemberSearchRequest</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="kt">long</span><span class="p">?</span> <span class="n">Id</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">Email</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">Name</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>** - Repository  (<em>MemberRepository.cs</em>)**</p>
+
+<blockquote>
+  <p>여기서는 실제 DB에 접근하는게 아닌 mock 데이터로 테스트</p>
+</blockquote>
+
+<div class="language-cs highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">MyPension.Dtos.Requests</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">MyPension.Dtos.VO</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">MyPension.Entities</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Collections.Generic</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Linq</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">MyPension.Repositories</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">class</span> <span class="nc">MemberRepository</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="n">IEnumerable</span><span class="p">&lt;</span><span class="n">MemberVO</span><span class="p">&gt;</span> <span class="nf">Search</span><span class="p">(</span><span class="n">MemberSearchRequest</span> <span class="n">request</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="kt">var</span> <span class="n">byId</span> <span class="p">=</span> <span class="n">request</span><span class="p">.</span><span class="n">Id</span><span class="p">;</span>
+            <span class="kt">var</span> <span class="n">byName</span> <span class="p">=</span> <span class="n">request</span><span class="p">.</span><span class="n">Name</span><span class="p">;</span>
+            <span class="kt">var</span> <span class="n">byEmail</span> <span class="p">=</span> <span class="n">request</span><span class="p">.</span><span class="n">Email</span><span class="p">;</span>
+
+            <span class="kt">var</span> <span class="n">query</span> <span class="p">=</span> <span class="nf">GetMocks</span><span class="p">().</span><span class="nf">AsQueryable</span><span class="p">();</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">byId</span><span class="p">.</span><span class="n">HasValue</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">query</span> <span class="p">=</span> <span class="n">query</span><span class="p">.</span><span class="nf">Where</span><span class="p">(</span><span class="n">x</span> <span class="p">=&gt;</span> <span class="n">x</span><span class="p">.</span><span class="n">Id</span> <span class="p">==</span> <span class="n">byId</span><span class="p">.</span><span class="n">Value</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="k">else</span>
+            <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(!</span><span class="n">String</span><span class="p">.</span><span class="nf">IsNullOrEmpty</span><span class="p">(</span><span class="n">byName</span><span class="p">))</span>
+                <span class="p">{</span>
+                    <span class="n">query</span> <span class="p">=</span> <span class="n">query</span><span class="p">.</span><span class="nf">Where</span><span class="p">(</span><span class="n">x</span> <span class="p">=&gt;</span> <span class="n">x</span><span class="p">.</span><span class="n">Name</span><span class="p">.</span><span class="nf">Contains</span><span class="p">(</span><span class="n">byName</span><span class="p">));</span>
+                <span class="p">}</span>
+
+                <span class="k">if</span> <span class="p">(!</span><span class="n">String</span><span class="p">.</span><span class="nf">IsNullOrEmpty</span><span class="p">(</span><span class="n">byEmail</span><span class="p">))</span>
+                <span class="p">{</span>
+                    <span class="n">query</span> <span class="p">=</span> <span class="n">query</span><span class="p">.</span><span class="nf">Where</span><span class="p">(</span><span class="n">x</span> <span class="p">=&gt;</span> <span class="n">x</span><span class="p">.</span><span class="n">Email</span><span class="p">.</span><span class="nf">Contains</span><span class="p">(</span><span class="n">byEmail</span><span class="p">));</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+
+            <span class="c1">//vo의 생성자로 entity를 던진다.</span>
+            <span class="c1">//vo를 만드는 여러가지 방법이 있지만 정답은 없다.</span>
+            <span class="kt">var</span> <span class="n">results</span> <span class="p">=</span> <span class="n">query</span><span class="p">.</span><span class="nf">Select</span><span class="p">(</span><span class="n">x</span> <span class="p">=&gt;</span> <span class="k">new</span> <span class="nf">MemberVO</span><span class="p">(</span><span class="n">x</span><span class="p">));</span>
+
+            <span class="k">return</span> <span class="n">results</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="c1">/// &lt;summary&gt;</span>
+        <span class="c1">/// 테스트 데이터를 만들자</span>
+        <span class="c1">/// &lt;/summary&gt;</span>
+        <span class="c1">/// &lt;returns&gt;&lt;/returns&gt;</span>
+        <span class="k">public</span> <span class="k">static</span> <span class="n">IEnumerable</span><span class="p">&lt;</span><span class="n">Member</span><span class="p">&gt;</span> <span class="nf">GetMocks</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="n">List</span><span class="p">&lt;</span><span class="n">Member</span><span class="p">&gt;</span> <span class="n">mock</span> <span class="p">=</span> <span class="k">new</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">Member</span><span class="p">&gt;();</span>
+            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="p">&lt;</span> <span class="m">1000</span><span class="p">;</span> <span class="n">i</span><span class="p">++)</span>
+            <span class="p">{</span>
+                <span class="n">mock</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="k">new</span> <span class="n">Member</span>
+                <span class="p">{</span>
+                    <span class="n">BirthDay</span> <span class="p">=</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">.</span><span class="nf">AddYears</span><span class="p">(-</span><span class="m">50</span><span class="p">).</span><span class="nf">AddMonths</span><span class="p">(</span><span class="n">i</span><span class="p">),</span>
+                    <span class="n">Email</span> <span class="p">=</span> <span class="s">$"jindalre</span><span class="p">{</span><span class="n">i</span><span class="p">}</span><span class="s">@gmail.com"</span><span class="p">,</span>
+                    <span class="c1">//테스트를 위해 id값을 큰값으로도 만듦</span>
+                    <span class="n">Id</span> <span class="p">=</span> <span class="n">i</span> <span class="p">%</span> <span class="m">2</span> <span class="p">==</span> <span class="m">0</span> <span class="p">?</span> <span class="kt">long</span><span class="p">.</span><span class="n">MaxValue</span> <span class="p">-</span> <span class="n">i</span> <span class="p">:</span> <span class="n">i</span><span class="p">,</span>
+                    <span class="n">Name</span> <span class="p">=</span> <span class="s">$"kim abc </span><span class="p">{</span><span class="n">i</span><span class="p">}</span><span class="s">"</span>
+                <span class="p">});</span>
+            <span class="p">}</span>
+            <span class="k">return</span> <span class="n">mock</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>** - Service (<em>PensionService.cs</em>)**</p>
+
+<div class="language-cs highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">MyPension.Dtos.Requests</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">MyPension.Dtos.VO</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">MyPension.Repositories</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Collections.Generic</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">MyPension.Services</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">class</span> <span class="nc">PensionService</span>
+    <span class="p">{</span>
+        <span class="k">private</span> <span class="k">readonly</span> <span class="n">MemberRepository</span> <span class="n">_memberRepository</span><span class="p">;</span>
+
+        <span class="k">public</span> <span class="nf">PensionService</span><span class="p">(</span><span class="n">MemberRepository</span> <span class="n">memberRepository</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">_memberRepository</span> <span class="p">=</span> <span class="n">memberRepository</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">public</span> <span class="n">IEnumerable</span><span class="p">&lt;</span><span class="n">MemberVO</span><span class="p">&gt;</span> <span class="nf">SearchMember</span><span class="p">(</span><span class="n">MemberSearchRequest</span> <span class="n">request</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="n">_memberRepository</span><span class="p">.</span><span class="nf">Search</span><span class="p">(</span><span class="n">request</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="3-startupcs-수정-1">3 startup.cs 수정</h3>
+<div class="language-cs highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">void</span> <span class="nf">ConfigureServices</span><span class="p">(</span><span class="n">IServiceCollection</span> <span class="n">services</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="p">............</span>
+	<span class="c1">// Graphql server등록</span>
+	<span class="n">services</span><span class="p">.</span><span class="nf">AddGraphQLServer</span><span class="p">().</span><span class="n">AddQueryType</span><span class="p">&lt;</span><span class="n">MyPension</span><span class="p">.</span><span class="n">Services</span><span class="p">.</span><span class="n">PensionService</span><span class="p">&gt;();</span>
+	<span class="c1">// 서비스 등록</span>
+	<span class="n">services</span><span class="p">.</span><span class="n">AddScoped</span><span class="p">&lt;</span><span class="n">MyPension</span><span class="p">.</span><span class="n">Services</span><span class="p">.</span><span class="n">PensionService</span><span class="p">&gt;();</span>
+	<span class="c1">// 리파지토리 등록</span>
+	<span class="n">services</span><span class="p">.</span><span class="n">AddScoped</span><span class="p">&lt;</span><span class="n">MyPension</span><span class="p">.</span><span class="n">Repositories</span><span class="p">.</span><span class="n">MemberRepository</span><span class="p">&gt;();</span>
+<span class="p">}</span>
+<span class="k">public</span> <span class="k">void</span> <span class="nf">Configure</span><span class="p">(</span><span class="n">IApplicationBuilder</span> <span class="n">app</span><span class="p">,</span> <span class="n">IWebHostEnvironment</span> <span class="n">env</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="p">............</span>
+     <span class="n">app</span><span class="p">.</span><span class="nf">UseRouting</span><span class="p">().</span><span class="nf">UseEndpoints</span><span class="p">(</span><span class="n">endpoints</span> <span class="p">=&gt;</span>
+	<span class="p">{</span>
+		<span class="n">endpoints</span><span class="p">.</span><span class="nf">MapGraphQL</span><span class="p">();</span>
+	<span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h3 id="4-graphql-test-1">4 graphql test</h3>
+<p><strong>실행</strong></p>
+<blockquote>
+  <p>http://localhost:5000/graphql/ 에서 아래 graphql query 작성 후 실행</p>
+</blockquote>
+
+<div class="language-graphql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">query</span><span class="p">{</span><span class="w">
+  </span><span class="n">results</span><span class="p">:</span><span class="n">searchMember</span><span class="p">(</span><span class="n">request</span><span class="p">:{</span><span class="n">name</span><span class="p">:</span><span class="s2">"kim"</span><span class="p">}){</span><span class="w">
+    </span><span class="n">id</span><span class="p">,</span><span class="w">
+    </span><span class="n">name</span><span class="p">,</span><span class="w">
+    </span><span class="n">birthDay</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p><strong>결과</strong></p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span>
+  <span class="dl">"</span><span class="s2">data</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+    <span class="dl">"</span><span class="s2">results</span><span class="dl">"</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">id</span><span class="dl">"</span><span class="p">:</span> <span class="mi">9223372036854776000</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">kim abc 0</span><span class="dl">"</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">birthDay</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">1971-09-09T00:00:00.000+09:00</span><span class="dl">"</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">id</span><span class="dl">"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">kim abc 1</span><span class="dl">"</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">birthDay</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">1971-10-09T00:00:00.000+09:00</span><span class="dl">"</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">id</span><span class="dl">"</span><span class="p">:</span> <span class="mi">9223372036854776000</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">kim abc 2</span><span class="dl">"</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">birthDay</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">1971-11-09T00:00:00.000+09:00</span><span class="dl">"</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">id</span><span class="dl">"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">kim abc 3</span><span class="dl">"</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">birthDay</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">1971-12-09T00:00:00.000+09:00</span><span class="dl">"</span>
+      <span class="p">},</span>
+<span class="p">........</span>      
+</code></pre></div></div>
+
+<h3 id="5-문제점-1">5. 문제점</h3>
+<p>원하는 결과가 나왔는가? 그렇치 않다. 2가지 문제점이 있는데</p>
+<ol>
+  <li>큰 수에 대한 id값이 잘려있다.</li>
+  <li>날짜만 필요한데 시간도 같이 나왔다.</li>
+</ol>
+
+<p>id값의 타입은 long인데 javascript의 number 타입은 온전히 8byte 숫자를 담을 수 없어서 뒷자리가 000으로 대체 된다.
+birthDay값은 날짜만 원하는데 시간 포맷과 +09:00의 system zone의 offset값도 같이 출력되었다.</p>
+<h5 id="c은-날짜타입이-datetime만-있고-date형이-따로-존재하지는-않는다"><em>c#은 날짜타입이 DateTime만 있고 Date형이 따로 존재하지는 않는다.</em></h5>
+
+<h5 id="참고로-graphql에서의-날짜는-iso-8061-규칙을-따른다-iso-8061">참고로 graphql에서의 날짜는 ISO 8061 규칙을 따른다. <a href="https://ko.wikipedia.org/wiki/ISO_8601">ISO 8061</a></h5>
+
+<h3 id="6-해결방법-1">6. 해결방법</h3>
+<p>graphql에서 지원하는 Scralars 타입은 아래 5개가 전부이며 그나마 ID는 String에 대한 alias에 불가하다.
+String, Boolean, Int, Float, ID
+즉 Boolean, Int, Float를 제외한 모든 타입은 모두 문자이다.
+그러면 이제 해결 방법중 가장 간단한 방법을 알아보자</p>
+<ol>
+  <li>id값 long type문제
+Startup.cs의 설정을 다음과 같이 수정한다.
+    <div class="language-cs highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="n">services</span><span class="p">.</span><span class="nf">AddGraphQLServer</span><span class="p">()</span>
+      <span class="p">.</span><span class="n">AddQueryType</span><span class="p">&lt;</span><span class="n">MyPension</span><span class="p">.</span><span class="n">Services</span><span class="p">.</span><span class="n">PensionService</span><span class="p">&gt;()</span>
+      <span class="p">.</span><span class="n">BindRuntimeType</span><span class="p">&lt;</span><span class="kt">long</span><span class="p">,</span> <span class="n">HotChocolate</span><span class="p">.</span><span class="n">Types</span><span class="p">.</span><span class="n">StringType</span><span class="p">&gt;();</span>
+</code></pre></div>    </div>
+    <blockquote>
+      <div class="language-cs highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">BindRuntimeType</span><span class="p">&lt;</span><span class="kt">long</span><span class="p">,</span> <span class="n">StringType</span><span class="p">&gt;</span> <span class="kt">long</span> <span class="err">타입을</span> <span class="n">String</span> <span class="err">타입으로</span> <span class="err">인식시켜준다</span><span class="p">.</span>
+</code></pre></div>      </div>
+    </blockquote>
+  </li>
+  <li>날짜 형식 문제
+세 가지 정도 해결방법이 있다.
+    <ol>
+      <li>attribute를 사용해서 DateTime type을 HotCholate.Types.DateType으로 변환</li>
+      <li>ObjectType을 상속받아서 Graphql용 type을 재정의</li>
+      <li>Query Resolver에서 DateTime 형을 String으로 변환</li>
+    </ol>
+  </li>
+</ol>
+
+<p>위 방법중 2, 3번은 기존 소스코드를 변경해야 하므로 다음에 알아보고 1번 방법을 설명하겠다.</p>
+
+<blockquote>
+
+  <p><em>MemberVO.cs</em></p>
+  <div class="language-cs highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="nf">GraphQLType</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">HotChocolate</span><span class="p">.</span><span class="n">Types</span><span class="p">.</span><span class="n">DateType</span><span class="p">))]</span>
+<span class="k">public</span> <span class="n">DateTime</span> <span class="n">BirthDay</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+</code></pre></div>  </div>
+</blockquote>
+
+<p><strong>수정 후 결과</strong></p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span>
+  <span class="dl">"</span><span class="s2">data</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+    <span class="dl">"</span><span class="s2">results</span><span class="dl">"</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">id</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">9223372036854775807</span><span class="dl">"</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">kim abc 0</span><span class="dl">"</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">birthDay</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">1971-09-09</span><span class="dl">"</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">id</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">1</span><span class="dl">"</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">kim abc 1</span><span class="dl">"</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">birthDay</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">1971-10-09</span><span class="dl">"</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">id</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">9223372036854775805</span><span class="dl">"</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">kim abc 2</span><span class="dl">"</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">birthDay</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">1971-11-09</span><span class="dl">"</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">id</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">3</span><span class="dl">"</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">kim abc 3</span><span class="dl">"</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">birthDay</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">1971-12-09</span><span class="dl">"</span>
+      <span class="p">},</span>
+<span class="p">......</span>      
+</code></pre></div></div>
+:ET
